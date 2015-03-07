@@ -1,0 +1,18 @@
+{
+	"serverConfig": {
+		"host": "localhost",
+		"port": 9002
+	},
+	"databaseConfig": {
+		"name": "",
+		"host": "",
+		"port":"",
+		"dialect":""
+	},
+	"custom": [
+		{
+			"name": "",
+			"value": ""
+		}
+	]
+}
