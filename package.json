@@ -31,8 +31,8 @@
     "type": "git",
     "url": "https://github.com/Sk1Zy/Node-Express-RestAPI-Bootstrap.git"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Grimur Danielsson",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/Sk1Zy/Node-Express-RestAPI-Bootstrap/issues"
   },

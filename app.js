@@ -26,7 +26,13 @@ function registerRoutes(app) {
 	_.forOwn(routes, function(container) {
 		_.forOwn(container, function(route, key) {
 			if(key !== "all") {
-				app[route.method.toLowerCase()](route.version + route.path, container.all.middleware, route.middleware, route.action);
+				app[route.method.toLowerCase()]
+				(container.all.version + 
+					container.all.prefix + 
+					route.path, 
+					container.all.middleware, 
+					route.middleware, 
+					route.action);
 			}
 		});
 	});
