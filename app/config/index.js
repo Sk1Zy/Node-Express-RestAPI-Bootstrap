@@ -40,8 +40,8 @@ function loadConfig(config) {
 		default:
 			configFile = require('./config.' + config.environment + '.json');
 	}
-	config.server = {
 
+	config.server = {
 		host: argv.host ? argv.host : configFile.serverConfig.host,
 		port: argv.port ? argv.port : configFile.serverConfig.port
 	};
