@@ -1,4 +1,5 @@
-var app = require('express')();
+var express = require('express');
+var app = express();
 var compression = require('compression');
 var bodyParser = require('body-parser');
 var expressValidator = require('express-validator');
@@ -6,6 +7,7 @@ var config = require('./app/config');
 var http = require('http');
 var routes = require('./app/config/routes');
 var _ = require('lodash');
+var path = require('path');
 
 function configureMiddleware(app) {
 	app.use(compression());
@@ -19,6 +21,7 @@ function configureMiddleware(app) {
 function configureRoutes(app) {
 
 	registerRoutes(app);
+	app.use('/docs', express.static(path.dirname(require.main.filename) + '/docs/api'));
 	app.use(configureErrorHandlers());
 }
 
@@ -27,8 +30,8 @@ function registerRoutes(app) {
 		_.forOwn(container, function(route, key) {
 			if(key !== "all") {
 				app[route.method.toLowerCase()]
-				(container.all.version + 
-					container.all.prefix + 
+				(	container.all.prefix + 
+					container.all.version + 
 					route.path, 
 					container.all.middleware, 
 					route.middleware, 

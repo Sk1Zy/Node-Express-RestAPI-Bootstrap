@@ -5,8 +5,12 @@ function ExampleCtrl() {
 }
 
 /**
- * @api {get} /v1/api/example
- * 
+ * @api {get} /api/v1/example Example Action
+ * @apiName ExampleAction
+ * @apiGroup ExampleGroup
+ * @apiVersion 1.0.0
+ * @apiDescription Example Description
+ *
  * @apiSuccess {String} message	Example message
  */
 function exampleAction(req, res, next) {
