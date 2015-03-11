@@ -1,4 +1,4 @@
-
+var errors = require('common-errors');
 
 function ExampleCtrl() {
 
@@ -14,6 +14,7 @@ function ExampleCtrl() {
  * @apiSuccess {String} message	Example message
  */
 function exampleAction(req, res, next) {
+	throw new errors.HttpStatusError(403, "Auth needed");
 	res.status(200).json({ message: "This is an example." });
 }
 

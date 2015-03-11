@@ -8,6 +8,8 @@ var http = require('http');
 var routes = require('./app/config/routes');
 var _ = require('lodash');
 var path = require('path');
+var pe = require('pretty-error').start();
+pe.skipNodeFiles();
 
 function configureMiddleware(app) {
 	app.use(compression());
