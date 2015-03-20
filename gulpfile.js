@@ -9,6 +9,9 @@ var moment = require('moment');
 var jshint = require('gulp-jshint');
 var stylish = require('jshint-stylish');
 var nodemon = require('gulp-nodemon');
+var apidoc = require('gulp-apidoc');
+//var jsinspect = require('gulp-jsinspect');
+var jscs = require('gulp-jscs');
 
 // Folder path definitions
 gulp.paths = {
@@ -22,6 +25,18 @@ gulp.paths = {
  gulp.task('tests', tests);
  gulp.task('hint', hint);
  gulp.task('server', server);
+ gulp.task('apidoc', function() {
+    apidoc.exec({
+        src: "app/controllers",
+        dest: "docs/api",
+        debug: true
+    });
+ });
+
+ gulp.task('jscs', function() {
+    return gulp.src('app/**/*.js')
+    .pipe(jscs());
+ });
 
 /**
  * Run when the tests task is run.
@@ -38,7 +53,7 @@ gulp.paths = {
     }
 
     runTests(argv);
-}
+ }
 
 /**
  * Runs all unit tests.
@@ -64,7 +79,7 @@ gulp.paths = {
         .pipe(mocha())
         .pipe(istanbul.writeReports({ reporters: reporters , reportOpts: { dir: 'reports/coverage/'}}));
     });
-}
+ }
 
 /**
  * Starts a nodemon server.
@@ -97,13 +112,13 @@ gulp.paths = {
         ext: 'js',
         env: { 'NODE_ENV': env }
     });
-}
+ }
 
 /**
  * Runs JSHint.
  */
  function hint() {
-  return gulp.src([gulp.paths.src + '/**.js', gulp.paths.tests + '/**.js'])
-  .pipe(jshint())
-  .pipe(jshint.reporter(stylish));
-}
+    return gulp.src([gulp.paths.src + '/**.js', gulp.paths.tests + '/**.js'])
+    .pipe(jshint())
+    .pipe(jshint.reporter(stylish));
+ }

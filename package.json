@@ -8,6 +8,7 @@
     "chai": "^2.1.1",
     "chai-as-promised": "^4.3.0",
     "colors": "^1.0.3",
+    "common-errors": "^0.4.18",
     "compression": "^1.4.1",
     "express": "^4.12.2",
     "express-validator": "^2.8.0",
@@ -29,6 +30,8 @@
     "gulp-mocha": "^2.0.0",
     "gulp-nodemon": "^1.0.5",
     "jshint-stylish": "^1.0.1",
+    "gulp-jscs": "^1.4.0",
+    "gulp-jsinspect": "0.0.0",
     "mocha": "^2.1.0"
   },
   "scripts": {
@@ -38,8 +41,8 @@
     "type": "git",
     "url": "https://github.com/Sk1Zy/Node-Express-RestAPI-Bootstrap.git"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Grimur Danielsson",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/Sk1Zy/Node-Express-RestAPI-Bootstrap/issues"
   },

@@ -8,6 +8,9 @@ var config = require('./app/config');
 var http = require('http');
 var routes = require('./app/config/routes');
 var _ = require('lodash');
+var path = require('path');
+var pe = require('pretty-error').start();
+pe.skipNodeFiles();
 
 function configureMiddleware(app) {
     app.use(compression());
@@ -19,19 +22,25 @@ function configureMiddleware(app) {
 }
 
 function configureRoutes(app) {
-
-    registerRoutes(app);
-    app.use(configureErrorHandlers());
+	registerRoutes(app);
+	app.use('/docs', express.static(path.dirname(require.main.filename) + '/docs/api'));
+	app.use(configureErrorHandlers());
 }
 
 function registerRoutes(app) {
-    _.forOwn(routes, function(container) {
-        _.forOwn(container, function(route, key) {
-            if(key !== "all") {
-                app[route.method.toLowerCase()](route.version + route.path, container.all.middleware, route.middleware, route.action);
-            }
-        });
-    });
+	_.forOwn(routes, function(container) {
+		_.forOwn(container, function(route, key) {
+			if(key !== "all") {
+				app[route.method.toLowerCase()]
+				(	container.all.prefix + 
+					container.all.version + 
+					route.path, 
+					container.all.middleware, 
+					route.middleware, 
+					route.action);
+			}
+		});
+	});
 }
 
 function configureErrorHandlers() {
