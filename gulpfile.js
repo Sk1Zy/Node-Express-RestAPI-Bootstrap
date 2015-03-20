@@ -6,6 +6,8 @@ var mocha = require('gulp-mocha');
 var istanbul = require('gulp-istanbul');
 var colors = require('colors');
 var moment = require('moment');
+var jshint = require('gulp-jshint');
+var stylish = require('jshint-stylish');
 
 gulp.paths = {
     src: 'src',
@@ -13,6 +15,12 @@ gulp.paths = {
 };
 
 gulp.task('tests', function(done) { UnitTests(done) });
+
+gulp.task('lint', function() {
+  return gulp.src([gulp.paths.src + '/**.js', gulp.paths.tests + '/**.js'])
+    .pipe(jshint())
+    .pipe(jshint.reporter(stylish));
+});
 
 function UnitTests(done) {
     var argv = minimist(process.argv.slice(2));
