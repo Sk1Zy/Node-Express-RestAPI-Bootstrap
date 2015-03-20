@@ -1,3 +1,5 @@
+'use strict';
+
 var app = require('express')();
 var compression = require('compression');
 var bodyParser = require('body-parser');

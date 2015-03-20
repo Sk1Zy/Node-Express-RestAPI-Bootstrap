@@ -1,8 +1,9 @@
-var fs = require("fs");
-var path = require("path");
+'use strict';
+
+var fs = require('fs');
+var path = require('path');
 var basename = path.basename(module.filename);
 var routes = {};
-var app = require('express')();
 
 fs
     .readdirSync(__dirname)

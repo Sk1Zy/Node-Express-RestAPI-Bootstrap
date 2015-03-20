@@ -1,6 +1,6 @@
-var os = require('os');
+'use strict';
+
 var argv = require('minimist')(process.argv.slice(2));
-var app = require('express')();
 
 function Config() {
 	return initialize({});
