@@ -15,7 +15,6 @@
     "express-winston": "^0.2.12",
     "gulp": "^3.8.11",
     "gulp-apidoc": "^0.1.2",
-    "gulp-jshint": "^1.9.2",
     "gulp-nodemon": "^1.0.5",
     "lodash": "^3.4.0",
     "minimist": "^1.1.1",
@@ -25,13 +24,12 @@
     "supertest": "^0.15.0"
   },
   "devDependencies": {
+    "gulp-eslint": "^0.7.0",
     "gulp-istanbul": "^0.6.0",
-    "gulp-jshint": "^1.9.4",
+    "gulp-jscpd": "0.0.3",
+    "gulp-jsinspect": "0.0.0",
     "gulp-mocha": "^2.0.0",
     "gulp-nodemon": "^1.0.5",
-    "jshint-stylish": "^1.0.1",
-    "gulp-jscs": "^1.4.0",
-    "gulp-jsinspect": "0.0.0",
     "mocha": "^2.1.0"
   },
   "scripts": {

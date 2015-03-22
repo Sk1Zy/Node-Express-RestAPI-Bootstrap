@@ -6,11 +6,11 @@ function Config() {
 	return initialize({});
 }
 
-function initialize(config) {
-	return loadConfig(config);
+function initialize() {
+	return loadConfig();
 }
 
-function loadConfig(config) {
+function loadConfig() {
 	if(argv.env) {
 		switch(argv.env) {
 			case "dev":

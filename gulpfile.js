@@ -6,12 +6,11 @@ var mocha = require('gulp-mocha');
 var istanbul = require('gulp-istanbul');
 var colors = require('colors');
 var moment = require('moment');
-var jshint = require('gulp-jshint');
-var stylish = require('jshint-stylish');
 var nodemon = require('gulp-nodemon');
 var apidoc = require('gulp-apidoc');
 //var jsinspect = require('gulp-jsinspect');
-var jscs = require('gulp-jscs');
+var eslint = require('gulp-eslint');
+var jscpd = require('gulp-jscpd');
 
 // Folder path definitions
 gulp.paths = {
@@ -23,7 +22,6 @@ gulp.paths = {
  * Gulp Tasks
  */
  gulp.task('tests', tests);
- gulp.task('hint', hint);
  gulp.task('server', server);
  gulp.task('apidoc', function() {
     apidoc.exec({
@@ -33,10 +31,21 @@ gulp.paths = {
     });
  });
 
- gulp.task('jscs', function() {
-    return gulp.src('app/**/*.js')
-    .pipe(jscs());
- });
+ gulp.task('lint', function () {
+    // Note: To have the process exit with an error code (1) on
+    //  lint error, return the stream and pipe to failOnError last.
+    return gulp.src([gulp.paths.src + '/**/*.js', gulp.paths.test + '/**/*.js'])
+        .pipe(eslint({ useEslintrc: true }))
+        .pipe(eslint.format());
+});
+
+ gulp.task('jscpd', function() {
+  return gulp.src([gulp.paths.src + '/**/*.js', gulp.paths.test + '/**/*.js'])
+    .pipe(jscpd({
+      'min-lines': 13,
+      verbose: true
+    }));
+});
 
 /**
  * Run when the tests task is run.
@@ -71,11 +80,11 @@ gulp.paths = {
 
     console.log('Running Mocha Unit Tests'.bold, '-' ,moment(Date.now()).format('MM/DD HH:mm:ss'));
 
-    gulp.src([gulp.paths.src + '/**.js'])
+    gulp.src([gulp.paths.src + '/**'])
     .pipe(istanbul())
     .pipe(istanbul.hookRequire())
     .on('finish', function() {
-        gulp.src([gulp.paths.tests + '/**.spec.js'])
+        gulp.src([gulp.paths.tests + '/**/*.spec.js'])
         .pipe(mocha())
         .pipe(istanbul.writeReports({ reporters: reporters , reportOpts: { dir: 'reports/coverage/'}}));
     });

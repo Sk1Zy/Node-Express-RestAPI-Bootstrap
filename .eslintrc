@@ -1,0 +1,14 @@
+{
+	"rules": {
+		"quotes":"single"
+	},
+	"env": {
+		"node": true,
+		"mocha": true
+	},
+	"globals": {
+
+	},
+	"plugins": [
+	]
+}
