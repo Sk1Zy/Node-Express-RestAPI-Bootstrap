@@ -1,4 +1,7 @@
 'use strict';
+/**
+ * Home module
+ */
 
 function Home() {
 	return {

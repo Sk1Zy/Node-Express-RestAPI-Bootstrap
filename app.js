@@ -22,25 +22,25 @@ function configureMiddleware(app) {
 }
 
 function configureRoutes(app) {
-	registerRoutes(app);
-	app.use('/docs', express.static(path.dirname(require.main.filename) + '/docs/api'));
-	app.use(configureErrorHandlers());
+    registerRoutes(app);
+    app.use('/docs', express.static(path.dirname(require.main.filename) + '/docs/api'));
+    app.use(configureErrorHandlers());
 }
 
 function registerRoutes(app) {
-	_.forOwn(routes, function(container) {
-		_.forOwn(container, function(route, key) {
-			if(key !== "all") {
-				app[route.method.toLowerCase()]
-				(	container.all.prefix + 
-					container.all.version + 
-					route.path, 
-					container.all.middleware, 
-					route.middleware, 
-					route.action);
-			}
-		});
-	});
+    _.forOwn(routes, function(container) {
+        _.forOwn(container, function(route, key) {
+            if(key !== "all") {
+                app[route.method.toLowerCase()]
+                (   container.all.prefix + 
+                    container.all.version + 
+                    route.path, 
+                    container.all.middleware, 
+                    route.middleware, 
+                    route.action);
+            }
+        });
+    });
 }
 
 function configureErrorHandlers() {

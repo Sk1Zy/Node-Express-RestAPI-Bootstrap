@@ -11,7 +11,8 @@ var apidoc = require('gulp-apidoc');
 //var jsinspect = require('gulp-jsinspect');
 var eslint = require('gulp-eslint');
 var jscpd = require('gulp-jscpd');
-var jsdoc = require('gulp-jsdoc');
+var yuidoc = require('gulp-yuidoc');
+var nodeInspector = require('gulp-node-inspector');
 
 // Folder path definitions
 gulp.paths = {
@@ -28,6 +29,7 @@ gulp.paths = {
  gulp.task('lint', runLinter);
  gulp.task('cpd', runJscpd);
  gulp.task('docs', runJsdoc);
+ gulp.task('debug', runDebug);
 
 /**
  * Runs all unit tests.
@@ -53,7 +55,7 @@ gulp.paths = {
         .pipe(mocha())
         .pipe(istanbul.writeReports({ reporters: reporters, reportOpts: { dir: 'reports/coverage/'}}));
     });
- }
+}
 
  /**
  * Run when the tests task is run.
@@ -70,7 +72,7 @@ gulp.paths = {
     }
 
     test(argv);
- }
+}
 
 /**
  * Starts a nodemon server.
@@ -103,33 +105,39 @@ gulp.paths = {
         ext: 'js',
         env: { 'NODE_ENV': env }
     });
- }
+}
 
- function runApidoc() {
+function runApidoc() {
     apidoc.exec({
         src: "app/controllers",
         dest: "docs/api",
         debug: true
     });
- }
+}
 
- function runLinter() {
+function runLinter() {
     // Note: To have the process exit with an error code (1) on
     //  lint error, return the stream and pipe to failOnError last.
     return gulp.src([gulp.paths.src + '/**/*.js', gulp.paths.test + '/**/*.js'])
-        .pipe(eslint({ useEslintrc: true }))
-        .pipe(eslint.format());
+    .pipe(eslint({ useEslintrc: true }))
+    .pipe(eslint.format());
 }
 
 function runJscpd() {
   return gulp.src([gulp.paths.src + '/**/*.js', gulp.paths.test + '/**/*.js'])
-    .pipe(jscpd({
+  .pipe(jscpd({
       'min-lines': 13,
       verbose: true
-    }));
+  }));
 }
 
 function runJsdoc() {
-    gulp.src([gulp.paths.src + '/**/*.js', gulp.paths.tests + '/**/*.js'])
-        .pipe(jsdoc('docs/source'));
+    gulp.src([gulp.paths.src + '/**/*.js', gulp.paths.tests + '/**/*.js', 'README.md'])
+    .pipe(yuidoc())
+    .pipe(gulp.dest('docs/source/'))
+}
+
+function runDebug() {
+    gulp.src([])
+    .pipe(nodeInspector());
 }

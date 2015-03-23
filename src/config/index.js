@@ -1,69 +1,84 @@
 'use strict';
 
+/**
+ * @description Parses configuration files according to the environment
+ * the project is being run in.
+ * @module Configuration
+ */
+
 var argv = require('minimist')(process.argv.slice(2));
 
+/**
+ * @class Config
+. */
 function Config() {
-	return initialize({});
-}
-
-function initialize() {
-	return loadConfig();
+    this.config = {};
 }
 
 function loadConfig() {
-	if(argv.env) {
-		switch(argv.env) {
-			case "dev":
-			case "development":
-				config.environment = "development";
-				break;
-			case "prod":
-			case "production":
-				config.environment = "production";
-				break;
-			default:
-				config.environment = "development";
-		}
-	}
+    if(argv.env) {
+        switch(argv.env) {
+            case "dev":
+            case "development":
+                this.config.environment = "development";
+                break;
+            case "prod":
+            case "production":
+                this.config.environment = "production";
+                break;
+            default:
+                this.config.environment = "development";
+        }
+    }
 
-	var configFile;
+    var configFile;
 
-	switch(config.environment) {
-		case "prod":
-		case "production":
-			configFile = require('./config.prod.json');
-			break;
-		case "dev":
-		case "development":
-			configFile = require('./config.dev.json');
-			break;
-		default:
-			configFile = require('./config.' + config.environment + '.json');
-	}
+    switch(this.config.environment) {
+        case "prod":
+        case "production":
+            configFile = require('./config.prod.json');
+            break;
+        case "dev":
+        case "development":
+            configFile = require('./config.dev.json');
+            break;
+        default:
+            configFile = require('./config.' + this.config.environment + '.json');
+    }
 
-	config.server = {
-		host: argv.host ? argv.host : configFile.serverConfig.host,
-		port: argv.port ? argv.port : configFile.serverConfig.port
-	};
+    this.config.server = {
+        host: argv.host ? argv.host : configFile.serverConfig.host,
+        port: argv.port ? argv.port : configFile.serverConfig.port
+    };
 
-	config.database = {
-		name: configFile.databaseConfig.name,
-		host: configFile.databaseConfig.host,
-		port: configFile.databaseConfig.port,
-		dialect: configFile.databaseConfig.dialect
-	};
+    this.config.database = {
+        name: configFile.databaseConfig.name,
+        host: configFile.databaseConfig.host,
+        port: configFile.databaseConfig.port,
+        dialect: configFile.databaseConfig.dialect
+    };
 
-	if(configFile.custom.length > 0) {
-		for(var i = 0; i < configFile.custom.length; i++) {
-			var custom = configFile.custom[i];
+    if(configFile.custom.length > 0) {
+        for(var i = 0; i < configFile.custom.length; i++) {
+            var custom = configFile.custom[i];
 
-			config[custom.name] = config.value;
-		}
-	}
+            this.config[custom.name] = this.config.value;
+        }
+    }
 
-	return config;
+    return this.config;
 }
 
-var config = new Config();
+function getConfig() {
+    return this.config;
+}
 
-module.exports = config;
+Config.prototype = {
+    loadConfig: loadConfig,
+    getConfig: getConfig
+};
+
+var config = new Config();
+config.loadConfig();
+
+module.exports = config.getConfig();
