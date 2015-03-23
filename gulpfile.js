@@ -11,6 +11,7 @@ var apidoc = require('gulp-apidoc');
 //var jsinspect = require('gulp-jsinspect');
 var eslint = require('gulp-eslint');
 var jscpd = require('gulp-jscpd');
+var jsdoc = require('gulp-jsdoc');
 
 // Folder path definitions
 gulp.paths = {
@@ -21,64 +22,28 @@ gulp.paths = {
 /**
  * Gulp Tasks
  */
- gulp.task('tests', tests);
- gulp.task('server', server);
- gulp.task('apidoc', function() {
-    apidoc.exec({
-        src: "app/controllers",
-        dest: "docs/api",
-        debug: true
-    });
- });
-
- gulp.task('lint', function () {
-    // Note: To have the process exit with an error code (1) on
-    //  lint error, return the stream and pipe to failOnError last.
-    return gulp.src([gulp.paths.src + '/**/*.js', gulp.paths.test + '/**/*.js'])
-        .pipe(eslint({ useEslintrc: true }))
-        .pipe(eslint.format());
-});
-
- gulp.task('jscpd', function() {
-  return gulp.src([gulp.paths.src + '/**/*.js', gulp.paths.test + '/**/*.js'])
-    .pipe(jscpd({
-      'min-lines': 13,
-      verbose: true
-    }));
-});
-
-/**
- * Run when the tests task is run.
- */
- function tests(done) {
-    var argv = minimist(process.argv.slice(2));
-    var auto = argv.auto ? argv.auto : false;
-
-    if(auto === true) {
-        console.log('Unit Tests will be run automatically on file change!'.bold.blue);
-        gulp.watch([gulp.paths.tests + '/**', gulp.paths.src + '/**'], function() {
-            runTests(argv);
-        });
-    }
-
-    runTests(argv);
- }
+ gulp.task('tests', runTests);
+ gulp.task('server', runServer);
+ gulp.task('apidoc', runApidoc);
+ gulp.task('lint', runLinter);
+ gulp.task('cpd', runJscpd);
+ gulp.task('docs', runJsdoc);
 
 /**
  * Runs all unit tests.
  */
- function runTests(argv) {
+ function test(argv) {
 
     var coverage = argv.coverage ? argv.coverage : false;
     var reporters;
 
-    if(typeof(coverage) === 'boolean') {
+    if(typeof (coverage) === 'boolean') {
         reporters = ['html'];
     } else {
         reporters = coverage.split(',');
     }
 
-    console.log('Running Mocha Unit Tests'.bold, '-' ,moment(Date.now()).format('MM/DD HH:mm:ss'));
+    console.log('Running Mocha Unit Tests'.bold, '-', moment(Date.now()).format('MM/DD HH:mm:ss'));
 
     gulp.src([gulp.paths.src + '/**'])
     .pipe(istanbul())
@@ -86,20 +51,37 @@ gulp.paths = {
     .on('finish', function() {
         gulp.src([gulp.paths.tests + '/**/*.spec.js'])
         .pipe(mocha())
-        .pipe(istanbul.writeReports({ reporters: reporters , reportOpts: { dir: 'reports/coverage/'}}));
+        .pipe(istanbul.writeReports({ reporters: reporters, reportOpts: { dir: 'reports/coverage/'}}));
     });
+ }
+
+ /**
+ * Run when the tests task is run.
+ */
+ function runTests() {
+    var argv = minimist(process.argv.slice(2));
+    var auto = argv.auto ? argv.auto : false;
+
+    if(auto === true) {
+        console.log('Unit Tests will be run automatically on file change!'.bold.blue);
+        gulp.watch([gulp.paths.tests + '/**', gulp.paths.src + '/**'], function() {
+            test(argv);
+        });
+    }
+
+    test(argv);
  }
 
 /**
  * Starts a nodemon server.
  */
- function server(done) {
+ function runServer(done) {
 
     var argv = minimist(process.argv.slice(2));
     var env;
 
     if(argv.env) {
-        if(typeof(argv.env) !== 'string') {
+        if(typeof (argv.env) !== 'string') {
             throw new Error('Invalid env argument! Must specify which type of environment. Example: "staging" or "development"');
         } else {
             env = argv.env;
@@ -123,11 +105,31 @@ gulp.paths = {
     });
  }
 
-/**
- * Runs JSHint.
- */
- function hint() {
-    return gulp.src([gulp.paths.src + '/**.js', gulp.paths.tests + '/**.js'])
-    .pipe(jshint())
-    .pipe(jshint.reporter(stylish));
+ function runApidoc() {
+    apidoc.exec({
+        src: "app/controllers",
+        dest: "docs/api",
+        debug: true
+    });
  }
+
+ function runLinter() {
+    // Note: To have the process exit with an error code (1) on
+    //  lint error, return the stream and pipe to failOnError last.
+    return gulp.src([gulp.paths.src + '/**/*.js', gulp.paths.test + '/**/*.js'])
+        .pipe(eslint({ useEslintrc: true }))
+        .pipe(eslint.format());
+}
+
+function runJscpd() {
+  return gulp.src([gulp.paths.src + '/**/*.js', gulp.paths.test + '/**/*.js'])
+    .pipe(jscpd({
+      'min-lines': 13,
+      verbose: true
+    }));
+}
+
+function runJsdoc() {
+    gulp.src([gulp.paths.src + '/**/*.js', gulp.paths.tests + '/**/*.js'])
+        .pipe(jsdoc('docs/source'));
+}
