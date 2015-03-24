@@ -9,7 +9,7 @@ var exampleCtrl = require('../controllers/ExampleCtrl');
 function Home() {
 	return {
 		get: {
-			path: "api/fag",
+			path: "/api/example",
 			method: "get",
 			action: exampleCtrl.exampleAction
 		}

@@ -13,6 +13,7 @@ var path = require('path');
 var winston = require('winston');
 var expressWinston = require('express-winston');
 var cors = require('cors');
+var helmet = require('helmet');
 var pe = require('pretty-error').start();
 pe.skipNodeFiles();
 
@@ -36,6 +37,7 @@ pe.skipNodeFiles();
  */
  Startup.prototype.configureMiddleware = function configureMiddleware() {
     app.use(compression());
+    app.use(helmet());
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: true }));
     app.use(expressValidator({
@@ -72,6 +74,10 @@ pe.skipNodeFiles();
 
                 if(app[route.method.toLowerCase()] === undefined) {
                     throw new Error("Invalid method name. See http://expressjs.com/4x/api.html#app.METHOD for valid method names.");
+                }
+
+                if(route.path.substr(0,1) !== '/') {
+                    logger.warn('Route "' + route.path + '" does not start with a slash. Add one or the route wont work.');
                 }
 
                 var routePath = (route.version || container.all.version || "") + (container.all.prefix || "") + route.path;
