@@ -21,11 +21,11 @@ pe.skipNodeFiles();
  * load configuration, load the appropriate middleware and create all the routes
  * that have been specified.
  */
-function Startup() {
-    this.configureMiddleware();
-    this.configureCors();
-    this.configureRoutes();
+ function Startup() {
     this.configureLoggers();
+    this.configureMiddleware();
+    this.configureCors(config.cors);
+    this.configureRoutes();
     this.startServer();
 }
 
@@ -34,7 +34,7 @@ function Startup() {
  * any app wide middleware here is the place to plug it in. This middleware is run
  * before any routes.
  */
-Startup.prototype.configureMiddleware = function configureMiddleware() {
+ Startup.prototype.configureMiddleware = function configureMiddleware() {
     app.use(compression());
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: true }));
@@ -46,7 +46,7 @@ Startup.prototype.configureMiddleware = function configureMiddleware() {
 /**
  * A function that registeres all the routes for the application.
  */
-Startup.prototype.configureRoutes = function configureRoutes() {
+ Startup.prototype.configureRoutes = function configureRoutes() {
     var that = this;
     that._registerRoutes();
     app.use('/docs', express.static(path.dirname(require.main.filename) + '/docs/api'));
@@ -57,17 +57,39 @@ Startup.prototype.configureRoutes = function configureRoutes() {
  * A function that loops through every route specified
  * in the route files and registeres them with express.
  */
-Startup.prototype._registerRoutes = function registerRoutes() {
+ Startup.prototype._registerRoutes = function registerRoutes() {
+    var that = this;
     _.forOwn(routes, function(container) {
+        if(!container.all) {
+            container.all = {};
+        }
+
         _.forOwn(container, function(route, key) {
             if(key !== "all") {
-                app[route.method.toLowerCase()]
-                (container.all.prefix + 
-                    container.all.version + 
-                    route.path, 
-                    container.all.middleware, 
-                    route.middleware, 
-                    route.action);
+                if(typeof (route.action) !== 'function') {
+                    throw new Error('Route action needs to be a function!');
+                }
+
+                if(app[route.method.toLowerCase()] === undefined) {
+                    throw new Error("Invalid method name. See http://expressjs.com/4x/api.html#app.METHOD for valid method names.");
+                }
+
+                var routePath = (route.version || container.all.version || "") + (container.all.prefix || "") + route.path;
+
+                var routeCors;
+                if(container.all.cors || route.cors) {
+
+                    if(route.cors.preFlight || container.all.cors.preFlight) {
+                        app.options(routePath, cors());
+                    }
+
+                    routeCors = that.configureCors(route.cors || container.all.cors);
+                }
+
+                var middleware = [].concat(routeCors, container.all.middleware, route.middleware).filter(function(n) { return n !== undefined; });
+
+                app[route.method.toLowerCase()](routePath, middleware, route.action);
+                logger.info('Created route "' + routePath + '".');
             }
         });
     });
@@ -77,11 +99,11 @@ Startup.prototype._registerRoutes = function registerRoutes() {
  * A function that registers error handling routes with express. These
  * are used by calling next(err) inside a controller action.
  */
-Startup.prototype.configureErrorHandlers = function configureErrorHandlers() {
+ Startup.prototype.configureErrorHandlers = function configureErrorHandlers() {
     var devErrorHandler;
     var prodErrorHandler;
 
-    devErrorHandler = function devErrorHandler(err, req, res) {
+    devErrorHandler = function devErrorHandler(err, req, res, next) {
         res.status(err.status || 500).json({
             message: err.message,
             error: err,
@@ -89,7 +111,7 @@ Startup.prototype.configureErrorHandlers = function configureErrorHandlers() {
         });
     };
 
-    prodErrorHandler = function prodErrorHandler(err, req, res) {
+    prodErrorHandler = function prodErrorHandler(err, req, res, next) {
 
         // When a api error occurs in production you don´t want to
         // return status code 500 or 403 due to security risks.
@@ -112,11 +134,10 @@ Startup.prototype.configureErrorHandlers = function configureErrorHandlers() {
 /**
  * Configures logging middleware defined in the config file.
  */
-Startup.prototype.configureLoggers = function configureLoggers() {
+ Startup.prototype.configureLoggers = function configureLoggers() {
 
     for(var i = 0; i < config.loggers.length; i++) {
         var logger = config.loggers[i];
-        console.log(logger);
         winston.loggers.add(logger.name, {
             file: logger.file
         });
@@ -132,8 +153,8 @@ Startup.prototype.configureLoggers = function configureLoggers() {
  * This function sets up global CORS middleware if
  * it is defined in the config file.
  */
-Startup.prototype.configureCors = function configureCors() {
-    if(config.cors) {
+ Startup.prototype.configureCors = function configureCors(corsConf) {
+    if(corsConf) {
         var options = {};
 
         if(config.cors.whitelist) {
@@ -143,17 +164,23 @@ Startup.prototype.configureCors = function configureCors() {
             };
         }
 
-        app.use(cors(options));
+        _.forOwn(config.cors, function(val, key) {
+            if(key !== "whitelist" && key !== "origin") {
+                options[key] = val;
+            }
+        });
+
+        return cors(options);
     }
 };
 
 /**
  * A function that starts up the express server.
  */
-Startup.prototype.startServer = function startServer() {
+ Startup.prototype.startServer = function startServer() {
     var server = http.createServer(app);
     server.listen(config.server.port, config.server.host, null, function() {
-        // TODO: Logging
+        logger.info("Server Started");
     });
 };
 

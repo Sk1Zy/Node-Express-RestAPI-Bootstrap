@@ -13,16 +13,20 @@
 		"whitelist": [
 			"http://localhost"
 		],
-		"pre-flight": true
+		"methods":"GET,PUT,POST,DELETE",
+		"allowedHeaders":"Content-Type,Authorization",
+		"exposedHeaders":"",
+		"maxAge":"",
+		"credentials": true
 	},
 	"loggers": [{
-      "name": "error",
+      "name": "logger",
       "file": {
           "level": "debug",
           "colorize": "true",
           "timestamp": "true",
           "json": "false",
-          "filename": "error.log"
+          "filename": "logger.log"
         },
       "global": true
     },

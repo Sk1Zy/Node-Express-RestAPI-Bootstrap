@@ -1,4 +1,7 @@
 'use strict';
+
+var exampleCtrl = require('../controllers/ExampleCtrl');
+
 /**
  * Home module
  */
@@ -6,14 +9,9 @@
 function Home() {
 	return {
 		get: {
-			path: "/api/fag",
-			version: "/v1",
+			path: "api/fag",
 			method: "get",
-			action: function(req, res){ console.log("action"); res.json({message: "lol" }); },
-			middleware: []
-		},
-		all: {
-			middleware: []
+			action: exampleCtrl.exampleAction
 		}
 	};
 }

@@ -9,7 +9,7 @@
 		"mocha": true
 	},
 	"globals": {
-
+		"logger": true
 	},
 	"plugins": [
 	]
