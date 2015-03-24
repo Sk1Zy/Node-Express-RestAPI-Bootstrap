@@ -6,29 +6,27 @@
  * @module Configuration
  */
 
-var argv = require('minimist')(process.argv.slice(2));
+ var argv = require('minimist')(process.argv.slice(2));
 
 /**
  * @class Config
-. */
-function Config() {
+ . */
+ function Config() {
     this.config = {};
 }
 
 function loadConfig() {
-    if(argv.env) {
-        switch(argv.env) {
-            case "dev":
-            case "development":
-                this.config.environment = "development";
-                break;
-            case "prod":
-            case "production":
-                this.config.environment = "production";
-                break;
-            default:
-                this.config.environment = "development";
-        }
+    switch(argv.env) {
+        case "dev":
+        case "development":
+        this.config.environment = "development";
+        break;
+        case "prod":
+        case "production":
+        this.config.environment = "production";
+        break;
+        default:
+        this.config.environment = "development";
     }
 
     var configFile;
@@ -36,14 +34,14 @@ function loadConfig() {
     switch(this.config.environment) {
         case "prod":
         case "production":
-            configFile = require('./config.prod.json');
-            break;
+        configFile = require('./config.prod.json');
+        break;
         case "dev":
         case "development":
-            configFile = require('./config.dev.json');
-            break;
+        configFile = require('./config.dev.json');
+        break;
         default:
-            configFile = require('./config.' + this.config.environment + '.json');
+        configFile = require('./config.' + this.config.environment + '.json');
     }
 
     this.config.server = {

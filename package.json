@@ -20,6 +20,7 @@
     "lodash": "^3.4.0",
     "minimist": "^1.1.1",
     "moment": "^2.9.0",
+    "pretty-error": "^1.1.1",
     "sequelize": "^2.0.3",
     "sinon": "^1.13.0",
     "supertest": "^0.15.0"

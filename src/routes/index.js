@@ -9,7 +9,8 @@ var path = require('path');
 
  function Routes() {
     var basename = path.basename(module.filename);
-    this.routes = {};
+    var that = this;
+    that.routes = {};
 
     fs
     .readdirSync(__dirname)
@@ -18,7 +19,7 @@ var path = require('path');
     })
     .forEach(function (file) {
         var route = require(path.join(__dirname, file));
-        this.routes[path.parse(file).name] = route;
+        that.routes[path.parse(file).name] = route;
     });
 }
 

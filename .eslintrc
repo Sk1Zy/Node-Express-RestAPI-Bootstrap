@@ -1,6 +1,8 @@
 {
 	"rules": {
-		"quotes":"single"
+		"quotes":"single",
+		"no-use-before-define": false,
+		"no-underscore-dangle": false
 	},
 	"env": {
 		"node": true,
