@@ -9,6 +9,34 @@
 		"port":"",
 		"dialect":""
 	},
+	"cors": {
+		"whitelist": [
+			"http://localhost"
+		],
+		"pre-flight": true
+	},
+	"loggers": [{
+      "name": "error",
+      "file": {
+          "level": "debug",
+          "colorize": "true",
+          "timestamp": "true",
+          "json": "false",
+          "filename": "error.log"
+        },
+      "global": true
+    },
+    {
+      "name": "access",
+      "file": {
+		  "level": "debug",
+		  "colorize": "true",
+		  "timestamp": "true",
+		  "json": "false",
+		  "filename": "access.log"
+		},
+      "global": false
+    }],
 	"custom": [
 		{
 			"name": "",

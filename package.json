@@ -23,7 +23,8 @@
     "pretty-error": "^1.1.1",
     "sequelize": "^2.0.3",
     "sinon": "^1.13.0",
-    "supertest": "^0.15.0"
+    "supertest": "^0.15.0",
+    "winston": "^0.9.0"
   },
   "devDependencies": {
     "gulp-eslint": "^0.7.0",

@@ -56,6 +56,9 @@ function loadConfig() {
         dialect: configFile.databaseConfig.dialect
     };
 
+    this.config.loggers = configFile.loggers;
+    this.config.cors = configFile.cors;
+
     if(configFile.custom.length > 0) {
         for(var i = 0; i < configFile.custom.length; i++) {
             var custom = configFile.custom[i];

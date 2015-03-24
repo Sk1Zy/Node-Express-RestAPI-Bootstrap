@@ -10,6 +10,9 @@ var http = require('http');
 var routes = require('./src/routes');
 var _ = require('lodash');
 var path = require('path');
+var winston = require('winston');
+var expressWinston = require('express-winston');
+var cors = require('cors');
 var pe = require('pretty-error').start();
 pe.skipNodeFiles();
 
@@ -20,7 +23,9 @@ pe.skipNodeFiles();
  */
 function Startup() {
     this.configureMiddleware();
+    this.configureCors();
     this.configureRoutes();
+    this.configureLoggers();
     this.startServer();
 }
 
@@ -105,11 +110,48 @@ Startup.prototype.configureErrorHandlers = function configureErrorHandlers() {
 };
 
 /**
+ * Configures logging middleware defined in the config file.
+ */
+Startup.prototype.configureLoggers = function configureLoggers() {
+
+    for(var i = 0; i < config.loggers.length; i++) {
+        var logger = config.loggers[i];
+        console.log(logger);
+        winston.loggers.add(logger.name, {
+            file: logger.file
+        });
+
+        app.use(expressWinston.logger({ winstonInstance: winston.loggers.get(logger.name)}));
+        if(logger.global) {
+            global[logger.name] = winston.loggers.get(logger.name);
+        }
+    }
+};
+
+/**
+ * This function sets up global CORS middleware if
+ * it is defined in the config file.
+ */
+Startup.prototype.configureCors = function configureCors() {
+    if(config.cors) {
+        var options = {};
+
+        if(config.cors.whitelist) {
+            options.origin = function(origin, callback) {
+                var originIsWhitelisted = config.cors.whitelist.indexof(origin) !== -1;
+                callback(null, originIsWhitelisted);
+            };
+        }
+
+        app.use(cors(options));
+    }
+};
+
+/**
  * A function that starts up the express server.
  */
 Startup.prototype.startServer = function startServer() {
     var server = http.createServer(app);
-    console.log("lal", config);
     server.listen(config.server.port, config.server.host, null, function() {
         // TODO: Logging
     });
