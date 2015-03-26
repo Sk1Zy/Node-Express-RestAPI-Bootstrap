@@ -23,23 +23,23 @@ gulp.paths = {
 /**
  * Gulp Tasks
  */
- gulp.task('tests', runTests);
- gulp.task('server', runServer);
- gulp.task('apidoc', runApidoc);
- gulp.task('lint', runLinter);
- gulp.task('cpd', runJscpd);
- gulp.task('docs', runJsdoc);
- gulp.task('debug', runDebug);
+gulp.task('tests', runTests);
+gulp.task('server', runServer);
+gulp.task('apidoc', runApidoc);
+gulp.task('lint', runLinter);
+gulp.task('cpd', runJscpd);
+gulp.task('docs', runJsdoc);
+gulp.task('debug', runDebug);
 
 /**
  * Runs all unit tests.
  */
- function test(argv) {
+function test(argv) {
 
     var coverage = argv.coverage ? argv.coverage : false;
     var reporters;
 
-    if(typeof (coverage) === 'boolean') {
+    if (typeof (coverage) === 'boolean') {
         reporters = ['html'];
     } else {
         reporters = coverage.split(',');
@@ -47,26 +47,37 @@ gulp.paths = {
 
     console.log('Running Mocha Unit Tests'.bold, '-', moment(Date.now()).format('MM/DD HH:mm:ss'));
 
-    gulp.src([gulp.paths.src + '/**'])
-    .pipe(istanbul())
-    .pipe(istanbul.hookRequire())
-    .on('finish', function() {
-        gulp.src([gulp.paths.tests + '/**/*.spec.js'])
-        .pipe(mocha())
-        .pipe(istanbul.writeReports({ reporters: reporters, reportOpts: { dir: 'reports/coverage/'}}));
-    });
+    gulp.src([gulp.paths.src + '/**/*.js'])
+        .pipe(istanbul())
+        .pipe(istanbul.hookRequire())
+        .on('finish', function() {
+            gulp.src([gulp.paths.tests + '/**/*.spec.js'])
+                .pipe(mocha())
+                .on('error', function() {
+                    this.emit('fail', {
+                        err: arguments
+                    });
+                })
+
+            .pipe(istanbul.writeReports({
+                reporters: reporters,
+                reportOpts: {
+                    dir: 'reports/coverage/'
+                }
+            }));
+        });
 }
 
- /**
+/**
  * Run when the tests task is run.
  */
- function runTests() {
+function runTests() {
     var argv = minimist(process.argv.slice(2));
     var auto = argv.auto ? argv.auto : false;
 
-    if(auto === true) {
+    if (auto === true) {
         console.log('Unit Tests will be run automatically on file change!'.bold.blue);
-        gulp.watch([gulp.paths.tests + '/**', gulp.paths.src + '/**'], function() {
+        gulp.watch([gulp.paths.tests + '/**/*.js', gulp.paths.src + '/**/*.js'], function() {
             test(argv);
         });
     }
@@ -77,23 +88,23 @@ gulp.paths = {
 /**
  * Starts a nodemon server.
  */
- function runServer(done) {
+function runServer() {
 
     var argv = minimist(process.argv.slice(2));
     var env;
 
-    if(argv.env) {
-        if(typeof (argv.env) !== 'string') {
+    if (argv.env) {
+        if (typeof(argv.env) !== 'string') {
             throw new Error('Invalid env argument! Must specify which type of environment. Example: "staging" or "development"');
         } else {
             env = argv.env;
         }
     } else {
-        if(argv.production || argv.prod) {
+        if (argv.production || argv.prod) {
             env = 'production';
-        } else if(argv.staging) {
+        } else if (argv.staging) {
             env = 'staging';
-        } else if(argv.dev || argv.development) {
+        } else if (argv.dev || argv.development) {
             env = 'development';
         } else {
             env = 'development';
@@ -103,10 +114,15 @@ gulp.paths = {
     nodemon({
         script: 'app.js',
         ext: 'js',
-        env: { 'NODE_ENV': env }
+        env: {
+            'NODE_ENV': env
+        }
     });
 }
 
+/**
+ * Creates API documentation using ApiDoc.
+ */
 function runApidoc() {
     apidoc.exec({
         src: "app/controllers",
@@ -119,25 +135,33 @@ function runLinter() {
     // Note: To have the process exit with an error code (1) on
     //  lint error, return the stream and pipe to failOnError last.
     return gulp.src([gulp.paths.src + '/**/*.js', gulp.paths.test + '/**/*.js'])
-    .pipe(eslint({ useEslintrc: true }))
-    .pipe(eslint.format());
+        .pipe(eslint({
+            useEslintrc: true
+        }))
+        .pipe(eslint.format());
 }
 
+/**
+ * Runs JS Copy/Paste detector.
+ */
 function runJscpd() {
-  return gulp.src([gulp.paths.src + '/**/*.js', gulp.paths.test + '/**/*.js'])
-  .pipe(jscpd({
-      'min-lines': 13,
-      verbose: true
-  }));
+    return gulp.src([gulp.paths.src + '/**/*.js', gulp.paths.test + '/**/*.js'])
+        .pipe(jscpd({
+            'min-lines': 13,
+            verbose: true
+        }));
 }
 
+/**
+ * Runs JS doc to generate documentation.
+ */
 function runJsdoc() {
     gulp.src([gulp.paths.src + '/**/*.js', gulp.paths.tests + '/**/*.js', 'README.md'])
-    .pipe(yuidoc())
-    .pipe(gulp.dest('docs/source/'))
+        .pipe(yuidoc())
+        .pipe(gulp.dest('docs/source/'))
 }
 
 function runDebug() {
     gulp.src([])
-    .pipe(nodeInspector());
+        .pipe(nodeInspector());
 }

@@ -1,30 +1,43 @@
 'use strict';
 
-var fs = require("fs");
-var path = require("path");
+function Database() {
+    this.models = {};
+}
 
-var basename = path.basename(module.filename);
-var Sequelize = require('sequelize');
-var sequelize = require('../config/database')();
-var db = {};
+Database.prototype.init = function init(sequelize) {
+    var that = this;
+    if(!sequelize) {
+        logger.error("Required argument Sequelize wasn't given.");
+    }
+    var fs = require("fs");
+    var path = require("path");
+    var basename = path.basename(module.filename);
+    var models = {};
+    models.sequelize = sequelize;
 
     fs
         .readdirSync(__dirname)
-        .filter(function (file) {
+        .filter(function(file) {
             return (file.indexOf(".") !== 0) && (file !== basename);
         })
-        .forEach(function (file) {
+        .forEach(function(file) {
             var model = sequelize.import(path.join(__dirname, file));
-            db[model.name] = model;
+            models[model.name] = model;
         });
 
-    Object.keys(db).forEach(function (modelName) {
-        if ("associate" in db[modelName]) {
-            db[modelName].associate(db);
+    Object.keys(models).forEach(function(modelName) {
+        if ("associate" in models[modelName]) {
+            models[modelName].associate(models);
         }
     });
 
-db.sequelize = sequelize;
-db.Sequelize = Sequelize;
+    models.sequelize = sequelize;
+    that.models = models;
+    return models;
+};
 
-module.exports = db;
+Database.prototype.getModels = function getModels() {
+    return this.models;
+};
+
+module.exports = new Database();

@@ -27,6 +27,7 @@ pe.skipNodeFiles();
     this.configureMiddleware();
     this.configureCors(config.cors);
     this.configureRoutes();
+    this.configureDatabase();
     this.startServer();
 }
 
@@ -188,6 +189,11 @@ pe.skipNodeFiles();
     server.listen(config.server.port, config.server.host, null, function() {
         logger.info("Server Started");
     });
+};
+
+Startup.prototype.configureDatabase = function configureDatabase() {
+    var database = require('src/config/database')();
+    require('src/models')(database);
 };
 
 var s = new Startup();
