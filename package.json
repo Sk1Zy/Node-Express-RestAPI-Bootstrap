@@ -27,6 +27,7 @@
     "winston": "^0.9.0"
   },
   "devDependencies": {
+    "casual": "^1.4.7",
     "gulp-eslint": "^0.7.0",
     "gulp-istanbul": "^0.6.0",
     "gulp-jscpd": "0.0.3",

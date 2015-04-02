@@ -8,7 +8,6 @@ var colors = require('colors');
 var moment = require('moment');
 var nodemon = require('gulp-nodemon');
 var apidoc = require('gulp-apidoc');
-//var jsinspect = require('gulp-jsinspect');
 var eslint = require('gulp-eslint');
 var jscpd = require('gulp-jscpd');
 var yuidoc = require('gulp-yuidoc');
@@ -54,7 +53,7 @@ function test(argv) {
             gulp.src([gulp.paths.tests + '/**/*.spec.js'])
                 .pipe(mocha())
                 .on('error', function() {
-                    this.emit('fail', {
+                    this.emit('end', {
                         err: arguments
                     });
                 })
